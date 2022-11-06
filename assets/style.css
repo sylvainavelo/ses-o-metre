@@ -11,6 +11,7 @@
 }
 
 h1 {
+    background-color: rgba(255,255,255,0.5);
     font-family: Georgia;
     padding: 1rem;
     position: absolute;

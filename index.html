@@ -7,9 +7,6 @@
         <script src='https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.js'></script>
         <link href='https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.css' rel='stylesheet' />
         <link href='assets/style.css' rel='stylesheet' />
-        <style>
-            
-        </style>
     </head>
     <body>
         <h1>Où étudie-t-on les SES&nbsp;?</h1>
@@ -24,11 +21,11 @@
                         'raster-tiles': {
                             'type': 'raster',
                             'tiles': [
-                                'https://wxs.ign.fr/cartes/geoportail/wmts?SERVICE=WMTS&style=normal&VERSION=1.0.0&REQUEST=GetTile&format=image/png&layer=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&tilematrixset=PM&TileMatrix={z}&TileCol={x}&TileRow={y}'
+                                'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
                             ],
                             'tileSize': 256,
                             'attribution':
-                                'Fond de carte <a target="_top" rel="noopener" href="http://www.ign.fr">IGN</a>'
+                                '&copy; <a target="_top" rel="noopener" href="http://www.openstreetmap.org">OpenStreetMap</a> contributors'
                         }
                     },
                     'layers': [
@@ -42,8 +39,10 @@
                     ]
                 },
                 center: [2, 47],
-                zoom: 5
+                zoom: 6
             });
+
+            map.addControl(new maplibregl.NavigationControl(), 'bottom-left');
 
             map.on('load', function() {
                 map.addSource('lycees', {
@@ -128,8 +127,8 @@
                         .setHTML('<h2>'+ feature.properties["Nom_etablissement"] + '</h2> \
                             <p>' + feature.properties["Nom_commune"] + ', académie de <strong>' + feature.properties["Libelle_academie"] + '</strong></p> \
                             <hr/> \
-                            <p>Cet établissement comptait <strong>' + feature.properties["2021_EFFECTIF_SES_1ERE"] + '</strong> \
-                            élèves de 1ère et <strong>' + feature.properties["2021_EFFECTIF_SES_TERM"] + '</strong> élèves de terminale \
+                            <p>Cet établissement comptait <strong>' + feature.properties["2021_EFFECTIF_SES_1ERE"] + '</strong> élèves de 1ère \
+                            et <strong>' + feature.properties["2021_EFFECTIF_SES_TERM"] + '</strong> élèves de terminale \
                             en spécialité SES à la rentrée 2021.</p>')
                         .addTo(map);
                 });
