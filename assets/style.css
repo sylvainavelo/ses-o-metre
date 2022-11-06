@@ -1,0 +1,26 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+#map {
+    bottom: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+
+h1 {
+    font-family: Georgia;
+    padding: 1rem;
+    position: absolute;
+    z-index: 10;
+}
+
+.hover h2 {
+    margin: 0 0 1rem 0;
+}
+
+.hover p {
+    margin: .5rem 0 .5rem 0;
+}
