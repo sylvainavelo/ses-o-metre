@@ -6,7 +6,7 @@
         <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
         <script src='https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.js'></script>
         <link href='https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.css' rel='stylesheet' />
-        <link href='assets/style.css' rel='stylesheet' />
+        <link href='assets/css/style.css' rel='stylesheet' />
     </head>
     <body>
         <h1>Où étudie-t-on les SES&nbsp;?</h1>
@@ -100,8 +100,9 @@
                         ],
                         "circle-radius": [
                             "interpolate", ["linear"], ["get", "2021_EFFECTIF_TOTAL_SES_1ERE_TERM"],
-                            0, 5, // 5px au minimum
-                            500, 30 // 30px max pour un effectif de 500
+                            0, 1, // taille minimale pour les lycées sans élèves en SES
+                            1, 5, // 5px au minimum à partir d'un élève
+                            600, 30 // 30px max pour un effectif de 600
                         ]
                     }
                 });
