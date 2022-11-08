@@ -45,6 +45,21 @@
             map.addControl(new maplibregl.NavigationControl(), 'bottom-left');
 
             map.on('load', function() {
+                map.addSource('academies',{
+                    type: 'geojson',
+                    data: 'geodata/academies.geojson'
+                });
+
+                map.addLayer({
+                    "id": "academies",
+                    "type": "line",
+                    "source": "academies",
+                    "paint": {
+                        "line-color": "#333",
+                        "line-width": 1
+                    }
+                });
+
                 map.addSource('lycees', {
                     type: 'geojson',
                     data: 'geodata/lycees-ses-2021.geojson',

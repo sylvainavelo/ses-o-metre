@@ -13,3 +13,5 @@ Ont été conservés uniquement les établissements publics avec des effectifs e
 La jointure des jeux de données et leur nettoyage a été réalisé avec QGIS.
 
 Les couleurs par académie sont aléatoires.
+
+Les académies de Normandie (Rouen et Caen) sont encore séparées dans le dataset des contours d'académies.
