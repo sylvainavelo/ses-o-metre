@@ -1,3 +1,10 @@
+:root {
+    --bg-color: rgba(255,255,255,0.5);
+    --dark-color: #4d4e50;
+    --light-color: #d1fee6;
+    --text-color: #4d4e50;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -11,28 +18,55 @@
 }
 
 .header {
-    background-color: rgba(255,255,255,0.7);
-    padding: 1rem;
+    background-color: var(--bg-color);
+    left: 0;
+    padding: 5px;
     position: absolute;
-    max-width: 600px;
+    top: 0;
+    width: 310px;
     z-index: 10;
 }
 
 h1 {
-    font-family: Georgia;
+    color: var(--text-color);
+    font-family: Georgia, serif;
+    margin-bottom: 1rem;
 }
 
-.header details {
+summary::marker {
+    color:var(--light-color);
+    font-size: 1.2em;
+}
+  
+summary {
+    background-color: var(--dark-color);
+    border-radius: 5px;
+    color: var(--light-color);
+    cursor: pointer;
+    font-weight: bold;
+    padding: 10px;
+}
+  
+details[open] summary {border-radius: 5px 5px 0 0;}
+  
+details {
+    background: var(--light-color);
+    border-radius: 5px;
+    color: var(--text-color);
     font-family: sans-serif;
     font-size: .8rem;
 }
 
+details[open] {
+    padding-bottom: .1rem;
+}
+
 .header li {
-    margin-left: 1.5rem;
+    margin: 0 .8rem 0 2rem;
 }
 
 .header p {
-    margin: .5rem 0 .5rem 0;
+    margin: .8rem;
 }
 
 .hover h2 {
