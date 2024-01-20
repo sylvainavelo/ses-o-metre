@@ -14,22 +14,18 @@
             <details>
                 <summary>Explications</summary>
                 <div>
-                    <p>Cartographie rapide avec <a href="https://github.com/maplibre/maplibre-gl-js">MapLibre</a> des lycées publics où on étudie les Sciences &Eacute;conomiques et Sociales.</p>
-
+                    <p>Cartographie rapide avec <a href="https://github.com/maplibre/maplibre-gl-js">MapLibre</a> des lycées publics et privés où on étudie les Sciences &Eacute;conomiques et Sociales.</p>
                     <p>Les données proviennent de <a href="https://data.education.gouv.fr">data.education.gouv.fr</a>. Plus précisément des jeux de données&nbsp;:</p>
-
                     <ul>
-                        <li>Annuaire de l'éducation (pour la localisation des établissements)</li>
-                        <li>Effectifs dans les enseignements de spécialités en Terminale générale par spécialités (rentrée 2022)</li>
-                        <li>Effectifs dans les enseignements de spécialités en 1ere générale par spécialités (rentrée 2022)</li>
-                        <li>Indice de Position Sociale (IPS) des lycées (2021-2022)</li>
+                        <li><a href="https://data.education.gouv.fr/explore/dataset/fr-en-annuaire-education">Annuaire de l'éducation</a> (pour la localisation des établissements)</li>
+                        <li><a href="https://data.education.gouv.fr/explore/dataset/fr-en-effectifs-specialites-doublettes-terminale-generale">Effectifs dans les enseignements de spécialités en Terminale générale</a> (rentrée 2022)</li>
+                        <li><a href="https://data.education.gouv.fr/explore/dataset/fr-en-effectifs-specialites-triplettes-1ere-generale">Effectifs dans les enseignements de spécialités en 1ère générale</a> (rentrée 2022)</li>
+                        <li><a href="https://data.education.gouv.fr/explore/dataset/fr-en-ips_lycees">Indice de Position Sociale (IPS) des lycées</a> (année scolaire 2021-2022)</li>
                     </ul>
-
-                    <p>La jointure des jeux de données et leur nettoyage a été réalisé avec <a href="https://www.qgis.org/">QGIS</a>.</p>   
-                        
+                    <p>La jointure des jeux de données et leur nettoyage a été réalisé avec <a href="https://www.qgis.org/">QGIS</a>.</p>
                     <p>Les couleurs correspondent à l'IPS de la voie générale et technologique (GT) pour l'année scolaire 2021-2022.</p>
-                    <p>Les lycées publics sont cerclés de vert, les lycées privés de violet</p>
-                    <p>Survolez les lycées pour avoir des détails</p>    
+                    <p>Les lycées publics sont cerclés de <span style="color:#0a7800;"><strong>vert</strong></span>, les lycées privés de <span style="color:#74318b;"><strong>violet</strong></span></p>
+                    <p>Survolez les lycées pour avoir des détails</p>
                 </div>
             </details>
         </div>
@@ -107,8 +103,8 @@
                         "circle-stroke-width": 2,
                         "circle-radius": [
                             "interpolate", ["linear"], ["get", "effectif_total_ses"],
-                            0, 1, // taille minimale pour les lycées sans élèves en SES
-                            1, 5, // 5px au minimum à partir d'un élève
+                            0, 2, // taille minimale pour les lycées sans élèves en SES
+                            1, 2, // 2px au minimum à partir d'un élève
                             600, 30 // 30px max pour un effectif de 600
                         ]
                     }
