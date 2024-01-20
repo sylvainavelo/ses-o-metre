@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="utf-8" />
+        <title>Les effectifs de SES dans l'académie de Lille</title>
+        <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+        <script src='https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.js'></script>
+        <link href='https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.css' rel='stylesheet' />
+        <link href='../assets/css/style.css' rel='stylesheet' />
+    </head>
+    <body>
+        <div class="header">
+            <h1><small>Les effectifs de SES dans l'académie de Lille</small></h1>
+            <details>
+                <summary>Explications</summary>
+                <div>
+                    <p>Cartographie rapide avec <a href="https://github.com/maplibre/maplibre-gl-js">MapLibre</a> des lycées <strong>publics</strong> où on étudie les Sciences &Eacute;conomiques et Sociales.</p>
+
+                    <p>Les données proviennent de <a href="https://data.education.gouv.fr">data.education.gouv.fr</a>. Plus précisément des jeux de données&nbsp;:</p>
+
+                    <ul>
+                        <li>Annuaire de l'éducation (pour la localisation des établissements)</li>
+                        <li>Effectifs dans les enseignements de spécialités en Terminale générale par spécialités (lycées publics, rentrée 2022)</li>
+                        <li>Effectifs dans les enseignements de spécialités en 1ere générale par spécialités  (lycées publics, rentrée 2022)</li>
+                        <li>Indice de Position Sociale (IPS) des lycées, année scolaire 2021-2022</li>
+                    </ul>
+
+                    <p>Ont été conservés uniquement les établissements publics avec des effectifs en 1ère ou en terminale en spécialité SES à la rentrée 2022. La taille des cercles est proportionnelle à ces effectifs.</p>
+                        
+                    <p>La couleur des cercles correspond aux IPS de la voie générale et technologique (ne prend pas en compte la voie pro s'il y en a une).</p>   
+                </div>
+            </details>
+        </div>
+
+        <div id="map"></div>
+
+        <script>
+            var map = new maplibregl.Map({
+                container: 'map',
+                style: {
+                    'version': 8,
+                    'sources': {
+                        'raster-tiles': {
+                            'type': 'raster',
+                            'tiles': [
+                                'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+                            ],
+                            'tileSize': 256,
+                            'attribution':
+                                '&copy; <a target="_top" rel="noopener" href="http://www.openstreetmap.org">OpenStreetMap</a> contributors'
+                        }
+                    },
+                    'layers': [
+                        {
+                            'id': 'simple-tiles',
+                            'type': 'raster',
+                            'source': 'raster-tiles',
+                            'minzoom': 7,
+                            'maxzoom': 18
+                        }
+                    ]
+                },
+                // centrage et zoom par défaut
+                center: [2.895, 50.409],
+                zoom: 8,
+                // bornes de zoom et de navigation
+                minZoom: 7,
+                maxZoom: 18,
+                maxBounds: [
+                    [0.75, 49.5], // [ouest, sud]
+                    [4.75, 51.75]  // [est, nord]
+                ]
+            });
+
+            map.addControl(new maplibregl.NavigationControl(), 'bottom-left');
+
+            map.on('load', function() {
+                map.addSource('lycees', {
+                    type: 'geojson',
+                    data: 'geodata/lycees-publics-lille-effectifs-ses-ips.geojson',
+                    attribution: '<a target="_top" rel="noopener" href="https://data.education.gouv.fr/">data.education.gouv.fr</a>'
+                });
+
+                map.addLayer({
+                    "id": "lycees",
+                    "type": "circle",
+                    "source": "lycees",
+                    "paint": {
+                        "circle-color": [
+                            "step", ["get", "ips_voie_gt_2021"],
+                            "#f9665e", 85, "#fec9c9", 95, "#eef1e6", 105, " #afc7d0",115, "#95b4cc", 125, "#799fcb"
+                        ],
+                        "circle-opacity": 0.8,
+                        "circle-stroke-color": "#000",
+                        "circle-stroke-width": 1,
+                        "circle-radius": [
+                            "interpolate", ["linear"], ["get", "effectif_total_ses_2022"],
+                            0, 1, // taille minimale pour les lycées sans élèves en SES
+                            1, 5, // 5px au minimum à partir d'un élève
+                            400, 30 // 30px max pour un effectif de 400
+                        ]
+                    }
+                });
+
+                var popup = new maplibregl.Popup({
+                    className: "hover",
+                    closeButton: false,
+                    closeOnClick: false
+                });
+
+                map.on('mousemove', function(e) {
+                    var features = map.queryRenderedFeatures(e.point, { layers: ['lycees'] });
+                    // Change l'apparence du curseur au survol des objets de la couche 'lycees'
+                    map.getCanvas().style.cursor = (features.length) ? 'pointer' : '';
+                    // Ferme la popup s'il n'y a rien sous la souris
+                    if (!features.length) {
+                        popup.remove();
+                        return;
+                    }
+                    // Ne considère que le premier lycée
+                    var feature = features[0];
+                    popup.setLngLat(feature.geometry.coordinates)
+                        .setHTML('<h2>'+ feature.properties["nom_etablissement"] + ', ' +feature.properties["nom_commune"]  + '</h2> \
+                            <p><strong>' + feature.properties["effectif_total_ses_2022"] + '</strong> élèves de première et terminale \
+                            en spécialité SES à la rentrée 2022.</p> \
+                            <p>IPS en 2021-2022&nbsp;: <strong>'+ feature.properties["ips_voie_gt_2021"].toString().replace(".",",") +'</strong></p>')
+                        .addTo(map);
+                });
+
+            });
+        </script>
+    </body>
+</html>
