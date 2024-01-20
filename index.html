@@ -20,17 +20,16 @@
 
                     <ul>
                         <li>Annuaire de l'éducation (pour la localisation des établissements)</li>
-                        <li>Effectifs dans les enseignements de spécialités en Terminale générale par spécialités et selon les principales doublettes (lycées publics, rentrée 2021)</li>
-                        <li>Effectifs dans les enseignements de spécialités en 1ere générale par spécialités et selon les principales triplettes  (lycées publics, rentrée 2021)</li>
+                        <li>Effectifs dans les enseignements de spécialités en Terminale générale par spécialités (rentrée 2022)</li>
+                        <li>Effectifs dans les enseignements de spécialités en 1ere générale par spécialités (rentrée 2022)</li>
+                        <li>Indice de Position Sociale (IPS) des lycées (2021-2022)</li>
                     </ul>
 
-                    <p>Ont été conservés uniquement les établissements publics avec des effectifs en 1ère ou en terminale en spécialité SES à la rentrée 2021, c'est à  dire qui sont présents dans tous les jeux de données utilisés. 1510 établissements sont représentés.</p>
-                        
                     <p>La jointure des jeux de données et leur nettoyage a été réalisé avec <a href="https://www.qgis.org/">QGIS</a>.</p>   
                         
-                    <p>Les couleurs par académie sont aléatoires.</p>    
-                        
-                    <p>Les académies de Normandie (Rouen et Caen) sont encore séparées dans les jeux de données.</p>
+                    <p>Les couleurs correspondent à l'IPS de la voie générale et technologique (GT) pour l'année scolaire 2021-2022.</p>
+                    <p>Les lycées publics sont cerclés de vert, les lycées privés de violet</p>
+                    <p>Survolez les lycées pour avoir des détails</p>    
                 </div>
             </details>
         </div>
@@ -58,8 +57,8 @@
                             'id': 'simple-tiles',
                             'type': 'raster',
                             'source': 'raster-tiles',
-                            'minzoom': 0,
-                            'maxzoom': 22
+                            'minzoom': 2,
+                            'maxzoom': 18
                         }
                     ]
                 },
@@ -87,7 +86,7 @@
 
                 map.addSource('lycees', {
                     type: 'geojson',
-                    data: 'geodata/lycees-ses-2021.geojson',
+                    data: 'geodata/lycees-ses-ips.geojson',
                     attribution: '<a target="_top" rel="noopener" href="https://data.education.gouv.fr/">data.education.gouv.fr</a>'
                 });
 
@@ -96,50 +95,18 @@
                     "type": "circle",
                     "source": "lycees",
                     "paint": {
-                        "circle-color": "#00ff00",
-                        "circle-opacity": 0.6,
-                        "circle-stroke-color": "#000",
-                        "circle-stroke-width": 1,
-                        'circle-color': [
-                            'match',
-                            ['get', 'Code_academie'],
-                            1, '#72afe5',
-                            2, '#452acc',
-                            3, '#48d69b',
-                            4, '#cba769',
-                            5, '#85c84b',
-                            6, '#8aef5f',
-                            7, '#72e1da',
-                            8, '#5759e7',
-                            9, '#6275cc',
-                            10, '#61b8db',
-                            11, '#9e4ee8',
-                            12, '#ceb13d',
-                            13, '#c8464e',
-                            14, '#d6214e',
-                            15, '#25cb2d',
-                            16, '#dede79',
-                            17, '#d4670d',
-                            18, '#df3cbc',
-                            19, '#ab54d1',
-                            20, '#ec3925',
-                            21, '#6de2c7',
-                            22, '#5ef080',
-                            23, '#c360d2',
-                            24, '#e75f9a',
-                            25, '#50dcef',
-                            27, '#b9db1f',
-                            28, '#e17247',
-                            31, '#145dd9',
-                            32, '#a3db3b',
-                            33, '#5c1fcc',
-                            41, '#e61592',
-                            43, '#d75ad1',
-                            44, '#60d58f',
-                            '#ccc' // autres codes
+                        "circle-color": [
+                            "step", ["get", "ips_2022_gt"],
+                            "#f9665e", 85, "#fec9c9", 95, "#eef1e6", 105, "#afc7d0",115, "#95b4cc", 125, "#799fcb"
                         ],
+                        "circle-opacity": 0.8,
+                        "circle-stroke-color": [
+                            "match", ["get", "statut_public_prive"],
+                            "Public", "#0a7800", "Privé", "#74318b", "#fff"
+                        ],
+                        "circle-stroke-width": 2,
                         "circle-radius": [
-                            "interpolate", ["linear"], ["get", "2021_EFFECTIF_TOTAL_SES_1ERE_TERM"],
+                            "interpolate", ["linear"], ["get", "effectif_total_ses"],
                             0, 1, // taille minimale pour les lycées sans élèves en SES
                             1, 5, // 5px au minimum à partir d'un élève
                             600, 30 // 30px max pour un effectif de 600
@@ -165,12 +132,11 @@
                     // Ne considère que le premier lycée
                     var feature = features[0];
                     popup.setLngLat(feature.geometry.coordinates)
-                        .setHTML('<h2>'+ feature.properties["Nom_etablissement"] + '</h2> \
-                            <p>' + feature.properties["Nom_commune"] + ', académie de <strong>' + feature.properties["Libelle_academie"] + '</strong></p> \
-                            <hr/> \
-                            <p>Cet établissement comptait <strong>' + feature.properties["2021_EFFECTIF_SES_1ERE"] + '</strong> élèves de 1ère \
-                            et <strong>' + feature.properties["2021_EFFECTIF_SES_TERM"] + '</strong> élèves de terminale \
-                            en spécialité SES à la rentrée 2021.</p>')
+                        .setHTML('<h2>'+ feature.properties["nom_etablissement"] + ' (' + feature.properties["statut_public_prive"] + ')</h2> \
+                            <p><em><strong>' + feature.properties["nom_commune"] + '</strong>, académie de <strong>' + feature.properties["libelle_academie"] + '</strong></em></p> \
+                            <p><strong>' + (feature.properties["effectif_total_ses"] == null ? 0 : feature.properties["effectif_total_ses"]) + '</strong> élèves de première et terminale \
+                            en spécialité SES à la rentrée 2022.</p> \
+                            <p>IPS 2021-2022 de la voie GT : <strong>' + feature.properties["ips_2022_gt"].toString().replace(".", ",") + '</strong></p>')
                         .addTo(map);
                 });
 
