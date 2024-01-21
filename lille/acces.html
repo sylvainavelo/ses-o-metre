@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="utf-8" />
+        <title>Temps d'accès aux lycées publics de l'académie de Lille</title>
+        <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+        <script src='https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.js'></script>
+        <link href='https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.css' rel='stylesheet' />
+        <link href='../assets/css/style.css' rel='stylesheet' />
+    </head>
+    <body>
+        <div class="header">
+            <h1><small>Temps d'accès aux lycées publics de l'académie de Lille</small></h1>
+        </div>
+
+        <div id="map"></div>
+
+        <script>
+            var map = new maplibregl.Map({
+                container: 'map',
+                style: {
+                    'version': 8,
+                    'sources': {
+                        'raster-tiles': {
+                            'type': 'raster',
+                            'tiles': [
+                                'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+                            ],
+                            'tileSize': 256,
+                            'attribution':
+                                '&copy; <a target="_top" rel="noopener" href="http://www.openstreetmap.org">OpenStreetMap</a> contributors'
+                        }
+                    },
+                    'layers': [
+                        {
+                            'id': 'simple-tiles',
+                            'type': 'raster',
+                            'source': 'raster-tiles',
+                            'minzoom': 7,
+                            'maxzoom': 18
+                        }
+                    ]
+                },
+                // centrage et zoom par défaut
+                center: [2.895, 50.409],
+                zoom: 8,
+                // bornes de zoom et de navigation
+                minZoom: 7,
+                maxZoom: 18,
+                maxBounds: [
+                    [0.75, 49.5], // [ouest, sud]
+                    [4.75, 51.75]  // [est, nord]
+                ]
+            });
+
+            map.addControl(new maplibregl.NavigationControl(), 'bottom-left');
+
+            map.on('load', function() {
+                map.addSource('lycees', {
+                    type: 'geojson',
+                    data: 'geodata/lycees-publics-lille-effectifs-ses-ips.geojson',
+                    attribution: '<a target="_top" rel="noopener" href="https://data.education.gouv.fr/">data.education.gouv.fr</a>'
+                });
+
+                map.addLayer({
+                    "id": "lycees",
+                    "type": "circle",
+                    "source": "lycees",
+                    "paint": {
+                        "circle-color": [
+                            "step", ["get", "temps_trajet_minutes"],
+                            "#3cb038", 20,
+                            "#8fc842", 40,
+                            "#dede4b", 60,
+                            "#e1963b", 80,
+                            "#FF4E11", 100,
+                            "#FF0D0D", 120,
+                            "#d129c9"
+                        ],
+                        "circle-opacity": 0.8,
+                        "circle-stroke-color": "#000",
+                        "circle-stroke-width": 1,
+                        "circle-radius": 8
+                    }
+                });
+
+                var popup = new maplibregl.Popup({
+                    className: "hover",
+                    closeButton: false,
+                    closeOnClick: false
+                });
+
+                map.on('mousemove', function(e) {
+                    var features = map.queryRenderedFeatures(e.point, { layers: ['lycees'] });
+                    // Change l'apparence du curseur au survol des objets de la couche 'lycees'
+                    map.getCanvas().style.cursor = (features.length) ? 'pointer' : '';
+                    // Ferme la popup s'il n'y a rien sous la souris
+                    if (!features.length) {
+                        popup.remove();
+                        return;
+                    }
+                    // Ne considère que le premier lycée
+                    var feature = features[0];
+                    popup.setLngLat(feature.geometry.coordinates)
+                        .setHTML('<h2>'+ feature.properties["nom_etablissement"] + ', ' +feature.properties["nom_commune"]  + '</h2> \
+                            <p>Temps de trajet : <strong>' + feature.properties["temps_trajet_minutes"] + ' min</strong></p> \
+                            <p>' + feature.properties["description_trajet"] + '</p>')
+                        .addTo(map);
+                });
+
+            });
+        </script>
+    </body>
+</html>
